@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>BVG TFT-Monitor - Professional Design</title>
+<title>BVG DAISY Monitor - Filter Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
 
 <style>
@@ -20,90 +20,70 @@
     /* --- STARTMENÜ --- */
     #search-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: #111; z-index: 1000; display: flex; flex-direction: column;
+        background: #1a1a1a; z-index: 1000; display: flex; flex-direction: column;
         justify-content: center; align-items: center; color: white;
     }
-    .config-panel { background: #222; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; border: 1px solid #444; }
-    .config-group { display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center; }
-    .config-group input[type="number"] { width: 70px; padding: 6px; border-radius: 4px; border: none; text-align: center; font-weight: bold; }
-    #station-query { width: 100%; padding: 15px; font-size: 18px; margin-top: 10px; border-radius: 4px; border: none; outline: none; }
-    #results-list { list-style: none; padding: 0; background: white; color: black; max-height: 180px; overflow-y: auto; border-radius: 4px; margin-top: 5px; }
-    #results-list li { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
-    #results-list li:hover { background: var(--bvg-yellow); }
+    .config-panel { 
+        background: #262626; padding: 30px; border-radius: 15px; 
+        width: 90%; max-width: 600px; border: 1px solid #333;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .config-panel h2 { color: var(--bvg-yellow); margin: 0 0 20px 0; font-size: 24px; }
+    
+    .config-group { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; font-size: 16px; }
+    .config-group input[type="number"] { width: 60px; padding: 8px; border-radius: 5px; border: none; text-align: center; font-weight: bold; background: white; }
+    
+    /* Pill-Buttons Styling */
+    .transport-pills { display: flex; gap: 8px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+    .pill { 
+        background: #444; color: #aaa; padding: 8px 18px; 
+        border-radius: 20px; font-weight: bold; font-size: 14px; cursor: pointer;
+        border: 2px solid transparent; transition: all 0.2s;
+        user-select: none;
+    }
+    .pill.active {
+        background: var(--bvg-yellow);
+        color: black;
+    }
+
+    #station-query { width: 100%; padding: 15px; font-size: 18px; border-radius: 8px 8px 0 0; border: none; outline: none; margin-top: 10px; }
+    #results-list { list-style: none; padding: 0; background: white; color: black; max-height: 250px; overflow-y: auto; border-radius: 0 0 8px 8px; margin: 0; }
+    #results-list li { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 16px; }
+    #results-list li:hover { background: #f0f0f0; }
 
     /* --- MONITOR DESIGN --- */
     #monitor { display: none; flex-direction: column; height: 100vh; width: 100vw; background: var(--lcd-bg); }
-    
-    .screen-content { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; }
+    .screen-content { flex: 1; display: flex; flex-direction: column; }
 
     .row {
         display: grid;
-        grid-template-columns: 12% 73% 15%; /* Zeitspalte etwas breiter für das Quadrat */
-        align-items: center; 
-        padding: 0;
-        border-bottom: 2px solid var(--lcd-border);
+        grid-template-columns: 12% 75% 13%;
+        align-items: center;
+        padding: 0 1.5vw;
+        border-bottom: 1.5px solid var(--lcd-border);
         color: var(--lcd-text);
         width: 100%;
-    }
-
-    /* Linien-Kachel */
-    .line-number {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.1em 0.3em;
-        border-radius: 4px;
-        color: white;
-        font-weight: 900;
-        min-width: 2.2em; 
-        height: 1.4em;
-        text-align: center;
-        font-size: 0.85em;
-    }
-
-    .destination { 
-        font-weight: 700; 
-        padding-left: 15px;
-        white-space: nowrap;
         overflow: hidden;
-        text-overflow: ellipsis;
     }
 
-    .row.long-text .destination {
-        white-space: normal;
-        line-height: 1.0;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        font-size: 0.9em;
+    .line-number {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 0.1em 0.3em; border-radius: 4px; color: white; font-weight: 900;
+        min-width: 2.2em; height: 1.4em; font-size: 0.8em;
     }
 
-    /* Zeit-Zelle Basis */
-    .time-cell { 
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        font-weight: 900; 
-        tabular-nums;
-        transition: background 0.2s;
-    }
-    .time-cell:not(.is-now)::after { content: " '"; }
+    .destination-container { padding-left: 15px; white-space: nowrap; overflow: hidden; display: flex; align-items: center; }
+    .destination { font-weight: 700; display: inline-block; transform-origin: left center; }
 
-    /* --- BLINK-EFFEKT (Nur Zeit-Quadrat) --- */
+    .time-cell { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 1vw; font-weight: 900; }
+    .time-cell:not(.is-now)::after { content: " '"; margin-left: 2px; }
+
     @keyframes flash-red {
         0%, 49% { background: var(--bvg-red); color: white; }
-        50%, 100% { background: var(--lcd-bg); color: var(--lcd-text); }
+        50%, 100% { background: transparent; color: var(--lcd-text); }
     }
+    .time-cell.is-now { animation: flash-red 1s steps(1) infinite; justify-content: center; padding-right: 0; }
 
-    .time-cell.is-now {
-        animation: flash-red 1s steps(1) infinite;
-        width: 100%;
-        height: 100%;
-    }
-
-    /* FOOTER */
     .footer { height: 10vh; background: var(--bvg-yellow); display: flex; justify-content: space-between; align-items: center; padding: 0 4vw; border-top: 5px solid black; flex-shrink: 0; }
     .station-name { font-weight: 900; font-size: 4.5vh; color: black; }
     .bvg-logo { font-family: "Arial Black", sans-serif; font-size: 5.5vh; letter-spacing: -2px; color: black; }
@@ -113,16 +93,25 @@
 
 <div id="search-overlay">
     <div class="config-panel">
-        <h2 style="color: var(--bvg-yellow); margin-top: 0;">TFT-Konfiguration</h2>
+        <h2>DAISY Konfiguration</h2>
         <div class="config-group">
-            <label>Zeilen-Budget (Max):</label>
-            <input type="number" id="cfg-max-lines" value="7" min="1" max="15">
+            <label>Zeilen-Budget (Gesamt):</label>
+            <input type="number" id="cfg-max-lines" value="7">
         </div>
         <div class="config-group">
-            <label>Umbruch ab Zeichen:</label>
-            <input type="number" id="cfg-threshold" value="22" min="5" max="50">
+            <label>Verkleinern ab Zeichen:</label>
+            <input type="number" id="cfg-threshold" value="22">
         </div>
-        <input type="text" id="station-query" placeholder="Haltestelle suchen..." autocomplete="off">
+        
+        <div class="transport-pills" id="pill-container">
+            <div class="pill active" data-type="suburban">S-Bahn</div>
+            <div class="pill active" data-type="subway">U-Bahn</div>
+            <div class="pill active" data-type="tram">Tram</div>
+            <div class="pill active" data-type="bus">Bus</div>
+            <div class="pill active" data-type="regional">Regio</div>
+        </div>
+
+        <input type="text" id="station-query" placeholder="Haltestelle suchen (z.B. Ostkreuz)" autocomplete="off">
         <ul id="results-list"></ul>
     </div>
 </div>
@@ -148,25 +137,32 @@
     let currentId = null;
     let timer = null;
 
+    // Pill-Logik: Klicken zum Umschalten
+    document.querySelectorAll('.pill').forEach(pill => {
+        pill.onclick = () => pill.classList.toggle('active');
+    });
+
     document.getElementById('station-query').addEventListener('input', async (e) => {
         const q = e.target.value;
         if (q.length < 3) return;
-        const r = await fetch(`https://v6.vbb.transport.rest/locations?query=${encodeURIComponent(q)}&results=5`);
-        const data = await r.json();
-        const list = document.getElementById('results-list');
-        list.innerHTML = '';
-        data.forEach(s => {
-            const li = document.createElement('li');
-            li.textContent = s.name;
-            li.onclick = () => {
-                currentId = s.id;
-                document.getElementById('display-station-name').textContent = s.name;
-                document.getElementById('search-overlay').style.display = 'none';
-                document.getElementById('monitor').style.display = 'flex';
-                startMonitor();
-            };
-            list.appendChild(li);
-        });
+        try {
+            const r = await fetch(`https://v6.vbb.transport.rest/locations?query=${encodeURIComponent(q)}&results=5`);
+            const data = await r.json();
+            const list = document.getElementById('results-list');
+            list.innerHTML = '';
+            data.forEach(s => {
+                const li = document.createElement('li');
+                li.textContent = s.name;
+                li.onclick = () => {
+                    currentId = s.id;
+                    document.getElementById('display-station-name').textContent = s.name;
+                    document.getElementById('search-overlay').style.display = 'none';
+                    document.getElementById('monitor').style.display = 'flex';
+                    startMonitor();
+                };
+                list.appendChild(li);
+            });
+        } catch(e) {}
     });
 
     function startMonitor() {
@@ -185,44 +181,60 @@
 
     async function update() {
         if(!currentId) return;
-        const maxBudget = parseInt(document.getElementById('cfg-max-lines').value) || 7;
+        const maxLines = parseInt(document.getElementById('cfg-max-lines').value) || 7;
         const threshold = parseInt(document.getElementById('cfg-threshold').value) || 22;
+        
+        const activeTypes = Array.from(document.querySelectorAll('.pill.active')).map(p => p.dataset.type);
 
         try {
-            const res = await fetch(`https://v6.vbb.transport.rest/stops/${currentId}/departures?duration=60&results=20`);
+            // Erhöhte Anzahl an Ergebnissen für bessere Sortiergrundlage
+            const res = await fetch(`https://v6.vbb.transport.rest/stops/${currentId}/departures?duration=90&results=50`);
             const data = await res.json();
             const container = document.getElementById('led-container');
             container.innerHTML = '';
 
-            let currentBudgetUsed = 0;
-            const rowHeight = 90 / maxBudget;
+            // 1. SCHRITT: Filtern
+            let departures = data.departures.filter(dep => activeTypes.includes(dep.line.product));
 
-            for (let dep of data.departures) {
-                const isLong = dep.direction.length > threshold;
-                const cost = isLong ? 2 : 1;
+            // 2. SCHRITT: Strikte chronologische Sortierung (Fehlerbehebung für große Bahnhöfe)
+            departures.sort((a, b) => {
+                const timeA = new Date(a.when || a.plannedWhen);
+                const timeB = new Date(b.when || b.plannedWhen);
+                return timeA - timeB;
+            });
 
-                if (currentBudgetUsed + cost > maxBudget) break;
-                currentBudgetUsed += cost;
+            const rowHeight = 90 / maxLines;
 
-                const diff = Math.round((new Date(dep.when || dep.plannedWhen) - new Date()) / 60000);
+            // 3. SCHRITT: Anzeige der sortierten Liste
+            departures.slice(0, maxLines).forEach(dep => {
+                const departureTime = new Date(dep.when || dep.plannedWhen);
+                const diff = Math.round((departureTime - new Date()) / 60000);
                 const min = diff <= 0 ? 0 : diff;
                 const bgColor = getLineColor(dep);
                 
+                let scaleX = 1;
+                if (dep.direction.length > threshold) {
+                    scaleX = threshold / dep.direction.length;
+                    if (scaleX < 0.55) scaleX = 0.55;
+                }
+
                 const row = document.createElement('div');
-                row.className = `row ${isLong ? 'long-text' : ''}`;
-                row.style.height = (rowHeight * cost) + 'vh';
-                row.style.fontSize = (rowHeight * 0.75) + 'vh'; 
+                row.className = `row`;
+                row.style.height = rowHeight + 'vh';
+                row.style.fontSize = (rowHeight * 0.7) + 'vh'; 
 
                 row.innerHTML = `
                     <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
                         <div class="line-number" style="background-color: ${bgColor}">${dep.line.name}</div>
                     </div>
-                    <div class="destination">${dep.direction}</div>
+                    <div class="destination-container">
+                        <div class="destination" style="transform: scaleX(${scaleX})">${dep.direction}</div>
+                    </div>
                     <div class="time-cell ${min === 0 ? 'is-now' : ''}">${min === 0 ? 'jetzt' : min}</div>
                 `;
                 container.appendChild(row);
-            }
-        } catch(e) { console.error(e); }
+            });
+        } catch(e) { console.error("Sortierfehler/API-Fehler:", e); }
     }
 
     window.addEventListener('keydown', e => {
