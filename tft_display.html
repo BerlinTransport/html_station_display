@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>BVG TFT-Monitor - Professional Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --bvg-yellow: #fbd100;
+        --lcd-bg: #ffffff;
+        --lcd-text: #000000;
+        --lcd-border: #dcdcdc;
+        --bvg-red: #be140e;
+    }
+
+    * { box-sizing: border-box; }
+    body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; background: #000; font-family: 'Roboto', sans-serif; overflow: hidden; }
+
+    /* --- STARTMENÜ --- */
+    #search-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #111; z-index: 1000; display: flex; flex-direction: column;
+        justify-content: center; align-items: center; color: white;
+    }
+    .config-panel { background: #222; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; border: 1px solid #444; }
+    .config-group { display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center; }
+    .config-group input[type="number"] { width: 70px; padding: 6px; border-radius: 4px; border: none; text-align: center; font-weight: bold; }
+    #station-query { width: 100%; padding: 15px; font-size: 18px; margin-top: 10px; border-radius: 4px; border: none; outline: none; }
+    #results-list { list-style: none; padding: 0; background: white; color: black; max-height: 180px; overflow-y: auto; border-radius: 4px; margin-top: 5px; }
+    #results-list li { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+    #results-list li:hover { background: var(--bvg-yellow); }
+
+    /* --- MONITOR DESIGN --- */
+    #monitor { display: none; flex-direction: column; height: 100vh; width: 100vw; background: var(--lcd-bg); }
+    
+    .screen-content { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; }
+
+    .row {
+        display: grid;
+        grid-template-columns: 12% 73% 15%; /* Zeitspalte etwas breiter für das Quadrat */
+        align-items: center; 
+        padding: 0;
+        border-bottom: 2px solid var(--lcd-border);
+        color: var(--lcd-text);
+        width: 100%;
+    }
+
+    /* Linien-Kachel */
+    .line-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.1em 0.3em;
+        border-radius: 4px;
+        color: white;
+        font-weight: 900;
+        min-width: 2.2em; 
+        height: 1.4em;
+        text-align: center;
+        font-size: 0.85em;
+    }
+
+    .destination { 
+        font-weight: 700; 
+        padding-left: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .row.long-text .destination {
+        white-space: normal;
+        line-height: 1.0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        font-size: 0.9em;
+    }
+
+    /* Zeit-Zelle Basis */
+    .time-cell { 
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-weight: 900; 
+        tabular-nums;
+        transition: background 0.2s;
+    }
+    .time-cell:not(.is-now)::after { content: " '"; }
+
+    /* --- BLINK-EFFEKT (Nur Zeit-Quadrat) --- */
+    @keyframes flash-red {
+        0%, 49% { background: var(--bvg-red); color: white; }
+        50%, 100% { background: var(--lcd-bg); color: var(--lcd-text); }
+    }
+
+    .time-cell.is-now {
+        animation: flash-red 1s steps(1) infinite;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* FOOTER */
+    .footer { height: 10vh; background: var(--bvg-yellow); display: flex; justify-content: space-between; align-items: center; padding: 0 4vw; border-top: 5px solid black; flex-shrink: 0; }
+    .station-name { font-weight: 900; font-size: 4.5vh; color: black; }
+    .bvg-logo { font-family: "Arial Black", sans-serif; font-size: 5.5vh; letter-spacing: -2px; color: black; }
+</style>
+</head>
+<body>
+
+<div id="search-overlay">
+    <div class="config-panel">
+        <h2 style="color: var(--bvg-yellow); margin-top: 0;">TFT-Konfiguration</h2>
+        <div class="config-group">
+            <label>Zeilen-Budget (Max):</label>
+            <input type="number" id="cfg-max-lines" value="7" min="1" max="15">
+        </div>
+        <div class="config-group">
+            <label>Umbruch ab Zeichen:</label>
+            <input type="number" id="cfg-threshold" value="22" min="5" max="50">
+        </div>
+        <input type="text" id="station-query" placeholder="Haltestelle suchen..." autocomplete="off">
+        <ul id="results-list"></ul>
+    </div>
+</div>
+
+<div id="monitor">
+    <div class="screen-content" id="led-container"></div>
+    <div class="footer">
+        <div class="station-name" id="display-station-name">-</div>
+        <div class="bvg-logo">BVG</div>
+    </div>
+</div>
+
+<script>
+    const lineColors = {
+        'U1': '#7dad4c', 'U2': '#da421e', 'U3': '#00a191', 'U4': '#f9d205',
+        'U5': '#7e4d25', 'U6': '#6c6c95', 'U7': '#7599cc', 'U8': '#003380', 'U9': '#f0d722',
+        'S1': '#f46a94', 'S2': '#006131', 'S25': '#006131', 'S26': '#006131', 'S3': '#00538f',
+        'S41': '#a3301a', 'S42': '#cc6633', 'S45': '#cc6633', 'S46': '#cc6633', 'S47': '#cc6633',
+        'S5': '#ff8a00', 'S7': '#7b107d', 'S75': '#7b107d', 'S8': '#5d9222', 'S85': '#5d9222', 'S9': '#8d2341',
+        'default-bus': '#95276e', 'default-tram': '#be140e', 'default-regio': '#da251d'
+    };
+
+    let currentId = null;
+    let timer = null;
+
+    document.getElementById('station-query').addEventListener('input', async (e) => {
+        const q = e.target.value;
+        if (q.length < 3) return;
+        const r = await fetch(`https://v6.vbb.transport.rest/locations?query=${encodeURIComponent(q)}&results=5`);
+        const data = await r.json();
+        const list = document.getElementById('results-list');
+        list.innerHTML = '';
+        data.forEach(s => {
+            const li = document.createElement('li');
+            li.textContent = s.name;
+            li.onclick = () => {
+                currentId = s.id;
+                document.getElementById('display-station-name').textContent = s.name;
+                document.getElementById('search-overlay').style.display = 'none';
+                document.getElementById('monitor').style.display = 'flex';
+                startMonitor();
+            };
+            list.appendChild(li);
+        });
+    });
+
+    function startMonitor() {
+        update();
+        if(timer) clearInterval(timer);
+        timer = setInterval(update, 30000);
+    }
+
+    function getLineColor(dep) {
+        if (lineColors[dep.line.name]) return lineColors[dep.line.name];
+        if (dep.line.product === 'bus') return lineColors['default-bus'];
+        if (dep.line.product === 'tram') return lineColors['default-tram'];
+        if (dep.line.product === 'regional') return lineColors['default-regio'];
+        return '#444444';
+    }
+
+    async function update() {
+        if(!currentId) return;
+        const maxBudget = parseInt(document.getElementById('cfg-max-lines').value) || 7;
+        const threshold = parseInt(document.getElementById('cfg-threshold').value) || 22;
+
+        try {
+            const res = await fetch(`https://v6.vbb.transport.rest/stops/${currentId}/departures?duration=60&results=20`);
+            const data = await res.json();
+            const container = document.getElementById('led-container');
+            container.innerHTML = '';
+
+            let currentBudgetUsed = 0;
+            const rowHeight = 90 / maxBudget;
+
+            for (let dep of data.departures) {
+                const isLong = dep.direction.length > threshold;
+                const cost = isLong ? 2 : 1;
+
+                if (currentBudgetUsed + cost > maxBudget) break;
+                currentBudgetUsed += cost;
+
+                const diff = Math.round((new Date(dep.when || dep.plannedWhen) - new Date()) / 60000);
+                const min = diff <= 0 ? 0 : diff;
+                const bgColor = getLineColor(dep);
+                
+                const row = document.createElement('div');
+                row.className = `row ${isLong ? 'long-text' : ''}`;
+                row.style.height = (rowHeight * cost) + 'vh';
+                row.style.fontSize = (rowHeight * 0.75) + 'vh'; 
+
+                row.innerHTML = `
+                    <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                        <div class="line-number" style="background-color: ${bgColor}">${dep.line.name}</div>
+                    </div>
+                    <div class="destination">${dep.direction}</div>
+                    <div class="time-cell ${min === 0 ? 'is-now' : ''}">${min === 0 ? 'jetzt' : min}</div>
+                `;
+                container.appendChild(row);
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    window.addEventListener('keydown', e => {
+        if(e.key === 'Escape') {
+            document.getElementById('search-overlay').style.display = 'flex';
+            document.getElementById('monitor').style.display = 'none';
+            clearInterval(timer);
+        }
+    });
+</script>
+</body>
+</html>
