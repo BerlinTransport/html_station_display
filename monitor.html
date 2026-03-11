@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>BVG Monitor - Live</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Hier kommt das gesamte CSS aus dem vorherigen Schritt rein (Themes, LED-Filter, etc.) */
+        :root { --led-orange: #ff9d00; --bg-black: #050505; --bvg-yellow: #fbd100; --bus-pink: #d82077; }
+        body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; }
+        
+        #monitor { display: flex; flex-direction: column; height: 100vh; }
+        
+        /* THEME LED */
+        .theme-led { background: var(--bg-black); }
+        .theme-led .header { background: #bcbcbc; color: black; display: grid; grid-template-columns: 15% 65% 20%; padding: 1vh 3vw; font-weight: bold; font-size: 3vh;}
+        .theme-led .screen { flex: 1; padding: 1vh 3vw; display: flex; flex-direction: column; filter: url(#ledFilter); }
+        .theme-led .row { display: grid; grid-template-columns: 15% 65% 20%; color: var(--led-orange); font-family: 'Archivo Narrow'; align-items: center; }
+        
+        /* THEME EPAPER */
+        .theme-epaper { background: white; color: #333; }
+        .theme-epaper .header { display: none; }
+        .theme-epaper .screen { flex: 1; padding: 2vh 5vw; display: flex; flex-direction: column; gap: 1.5vh; }
+        .theme-epaper .row { display: grid; grid-template-columns: 15% 70% 15%; border-bottom: 1px solid #ccc; padding-bottom: 1vh; font-family: 'Inter'; }
+        .theme-epaper .line-badge { background: var(--bus-pink); color: white; padding: 0.2em 0.5em; border-radius: 4px; font-weight: bold; }
+        .theme-epaper .time-cell { font-weight: bold; text-align: right; }
+        .theme-epaper .time-cell::after { content: "'"; }
+
+        .footer { height: 8vh; background: white; display: flex; justify-content: space-between; align-items: center; padding: 0 4vw; border-top: 1px solid #ccc; font-family: sans-serif; }
+        .bvg-logo { background: var(--bvg-yellow); padding: 0.2vh 1vh; border: 3px solid black; font-family: 'Arial Black'; }
+        
+        @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        .is-blinking .time-cell { animation: blink 1s steps(1) infinite; }
+    </style>
+</head>
+<body>
+
+<div id="monitor">
+    <div class="header"><span>Linie</span><span>Ziel</span><span style="text-align:right">Min</span></div>
+    <div class="screen" id="container"></div>
+    <div class="footer">
+        <span id="stat-name" style="font-weight:bold; font-size: 3vh;">-</span>
+        <div class="bvg-logo">BVG</div>
+    </div>
+</div>
+
+<svg style="position:absolute; width:0; height:0"><defs><filter id="ledFilter"><feImage x="0" y="0" width="4" height="4" result="dot" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIxLjUiIGZpbGw9IndoaXRlIi8+PC9zdmc+"/> <feTile/><feComposite operator="in" in="SourceGraphic"/></filter></defs></svg>
+
+<script>
+    // URL Parameter auslesen
+    const urlParams = new URLSearchParams(window.location.search);
+    const config = {
+        id: urlParams.get('id'),
+        name: urlParams.get('name'),
+        theme: urlParams.get('theme') || 'theme-led',
+        lines: parseInt(urlParams.get('lines')) || 7,
+        threshold: parseInt(urlParams.get('threshold')) || 22
+    };
+
+    document.getElementById('monitor').className = config.theme;
+    document.getElementById('stat-name').textContent = config.name;
+
+    async function update() {
+        if (!config.id) return;
+        try {
+            const res = await fetch(`https://v6.vbb.transport.rest/stops/${config.id}/departures?duration=60&results=30`);
+            const data = await res.json();
+            const container = document.getElementById('container');
+            container.innerHTML = '';
+
+            const fontSize = config.theme === 'theme-epaper' ? Math.floor(60/config.lines) : Math.floor(82/config.lines);
+
+            data.departures?.slice(0, config.lines).forEach(dep => {
+                const diff = Math.round((new Date(dep.when || dep.plannedWhen) - new Date()) / 60000);
+                const min = diff <= 0 ? 0 : diff;
+                
+                let iconColor = "#d82077"; // Bus Pink
+                if(dep.line.product === 'suburban') iconColor = "#008e4e";
+                if(dep.line.product === 'subway') iconColor = "#00519e";
+
+                const row = document.createElement('div');
+                row.className = `row ${min === 0 ? 'is-blinking' : ''}`;
+                row.style.fontSize = fontSize + 'vh';
+                
+                const badgeStyle = config.theme === 'theme-epaper' ? `style="background-color: ${iconColor}"` : "";
+
+                row.innerHTML = `
+                    <div><span class="line-badge" ${badgeStyle}>${dep.line.name}</span></div>
+                    <div style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${dep.direction}</div>
+                    <div class="time-cell">${min}</div>
+                `;
+                container.appendChild(row);
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    update();
+    setInterval(update, 20000);
+
+    // Zurück zum Menü mit ESC
+    window.onkeydown = (e) => { if(e.key === 'Escape') window.location.href = 'index.html'; };
+</script>
+</body>
+</html>
