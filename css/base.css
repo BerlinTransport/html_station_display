@@ -60,95 +60,6 @@ body, html {
     100%{ background-size: 20% 100%, 20% 100%, 20% 100% }
 }
 
-.bvg-logo {
-    background: var(--bvg-yellow);
-    padding: 0.2vh 1vh;
-    border: 0.4vh solid black;
-    font-family: 'Arial Black';
-    letter-spacing: -1px;
-}
-
-/* ── App-Footer (Startmenü-Stil) ── */
-#app-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 42px;
-    background: #262626;
-    border-top: 1px solid #333;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    z-index: 1100;
-    font-family: Arial, sans-serif;
-    font-size: 15px;
-    color: white;
-    gap: 12px;
-    box-sizing: border-box;
-}
-
-#app-footer .footer-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-}
-
-#app-footer .footer-avatar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    border: 1px solid #555;
-    object-fit: cover;
-}
-
-#app-footer a {
-    color: white;
-    text-decoration: none;
-    font-size: 15px;
-    transition: color 0.2s;
-}
-
-#app-footer a:hover {
-    color: var(--bvg-yellow);
-}
-
-#app-footer .footer-sep {
-    color: #555;
-    font-size: 15px;
-}
-
-#app-footer .footer-version {
-    color: #777;
-    font-size: 15px;
-    flex-shrink: 0;
-}
-/* ── VBB Logo ── */
-.vbb-logo {
-    height: 28px;
-    width: auto;
-    object-fit: contain;
-}
-
-.vbb-provided {
-    font-size: 13px;
-    white-space: nowrap;
-}
-
-
-/* Daisy: Logo weiß einfärben (SVG auf schwarzem Grund) */
-.vbb-logo--daisy {
-    filter: invert(1);
-    opacity: 0.75;
-}
-
-/* TFT: Logo auf gelbem Grund – dunkel lassen */
-.vbb-logo--tft {
-    filter: none;
-    opacity: 0.8;
-}
 /* ── Globaler Footer (Daisy-Stil) ── */
 #global-footer {
     position: fixed;
@@ -231,14 +142,7 @@ body, html {
     transition: opacity 0.2s;
 }
 
-#global-footer-right a:hover {
-    opacity: 1;
-}
+#global-footer-right a:hover { opacity: 1; }
 
-.gf-sep {
-    opacity: 0.3 !important;
-}
-
-.gf-version {
-    opacity: 0.45 !important;
-}
+.gf-sep     { opacity: 0.3  !important; }
+.gf-version { opacity: 0.45 !important; }

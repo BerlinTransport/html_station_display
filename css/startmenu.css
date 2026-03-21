@@ -10,6 +10,7 @@
     align-items: center;
     color: white;
     padding: 20px;
+    padding-bottom: calc(7vh + 20px);
 }
 
 .config-panel {
@@ -50,7 +51,6 @@
     transform: scale(1.2);
 }
 
-/* ── Gemeinsame Pill-Basis für Varianten- UND Filter-Buttons ── */
 .variant-btn,
 .filter-bar label {
     display: inline-flex;
@@ -101,6 +101,8 @@
 .filter-bar input { display: none; }
 
 #station-query {
+    position: relative;
+    z-index: 1300;
     width: 100%;
     padding: 15px;
     font-size: 18px;
@@ -111,6 +113,8 @@
 }
 
 #results-list {
+    position: relative;
+    z-index: 1300;
     list-style: none;
     padding: 0;
     background: white;
@@ -140,100 +144,3 @@
 }
 
 #search-error { color: #ff6b6b; }
-
-/* ── Config-Panel Footer ── */
-.config-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 42px;
-    background: #262626;
-    border-top: 1px solid #333;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    box-sizing: border-box;
-    z-index: 1200;
-}
-
-.config-footer-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-}
-
-.config-footer-station {
-    color: #aaa;
-    font-size: 13px;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.config-footer-left .vbb-logo {
-    height: 24px;
-}
-
-.config-footer-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-.config-footer-right a,
-.config-footer-right span {
-    color: #aaa;
-    font-size: 13px;
-    text-decoration: none;
-    font-weight: bold;
-    white-space: nowrap;
-    transition: color 0.2s;
-}
-
-.config-footer-right a:hover {
-    color: var(--bvg-yellow);
-}
-
-.config-footer-sep {
-    color: #444 !important;
-}
-
-.config-footer-version {
-    color: #555 !important;
-}
-
-.config-footer-avatar {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    border: 1px solid #555;
-    object-fit: cover;
-}
-
-#results-list {
-    position: relative;
-    z-index: 1300;
-}
-
-#station-query {
-    position: relative;
-    z-index: 1300;
-}
-
-#search-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: #1a1a1a;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    padding: 20px;
-    padding-bottom: calc(7vh + 20px);
-}
