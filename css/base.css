@@ -146,3 +146,23 @@ body, html {
 
 .gf-sep     { opacity: 0.3  !important; }
 .gf-version { opacity: 0.45 !important; }
+
+/* ── Footer Zurück-Button ── */
+.footer-back-btn {
+    background: transparent;
+    border: none;
+    color: var(--led-orange);
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 1.6vh;        /* gleiche Größe wie .gf-label */
+    opacity: 0.4;
+    cursor: pointer;
+    padding: 0;              /* kein eigenes Padding — gap übernimmt den Abstand */
+    margin: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+
+.footer-back-btn:hover {
+    opacity: 1;
+}
+
