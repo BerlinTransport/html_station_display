@@ -58,15 +58,6 @@ http://localhost:8080
         ├── render-tft.js     # Rendering — TFT mode
         └── monitor.js        # Update loop, ESC handler
 
-## ⚙️ Configuration
-Option	Description
-Variant	Daisy (LED) or TFT (LCD)
-Line Budget	Maximum number of departures displayed
-Character Threshold	Destination text wraps or shrinks beyond this length
-Ticker	Enable/disable scrolling text band (Daisy only)
-Filters	Toggle individual transport types
-
-
 ## 🔌 API
 
 This project uses the public VBB REST API v6:
