@@ -2,6 +2,17 @@ function renderDaisy(departures, totalLines, threshold, showTicker) {
     const container = document.getElementById('led-container-daisy');
     container.innerHTML = '';
 
+    // Keine Abfahrten
+    if (departures.length === 0) {
+        const fontSize = Math.floor(82 / totalLines);
+        const msg = document.createElement('div');
+        msg.style.cssText = `flex:1;display:flex;align-items:center;justify-content:center;color:var(--led-orange);font-family:"Archivo Narrow",sans-serif;font-size:${fontSize}vh;`;
+        msg.textContent = 'Derzeit keine Abfahrten';
+        container.appendChild(msg);
+        hideLoader();
+        return;
+    }
+
     const trainBudget = showTicker ? (totalLines - 1) : totalLines;
     const fontSize = Math.floor(82 / totalLines);
     let usedLines = 0;

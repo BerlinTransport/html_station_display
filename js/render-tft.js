@@ -2,6 +2,18 @@ function renderTFT(departures, totalLines, threshold) {
   const container = document.getElementById('led-container-tft');
   container.innerHTML = '';
 
+  // Keine Abfahrten
+  if (departures.length === 0) {
+        const rowHeight = 90 / totalLines;
+        const msg = document.createElement('div');
+        msg.style.cssText = `flex:1;display:flex;align-items:center;justify-content:center;color:var(--lcd-text);font-family:"Roboto",sans-serif;font-size:${rowHeight * 0.7}vh;font-weight:bold;`;
+        msg.textContent = 'Derzeit keine Abfahrten';
+        container.appendChild(msg);
+        hideLoader();
+        return;
+    }
+
+
   const rowHeight = 90 / totalLines;
 
   departures.slice(0, totalLines).forEach(dep => {
