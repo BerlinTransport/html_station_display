@@ -17,27 +17,24 @@ function getLineColor(dep) {
 
 // Display-Variante
 document.querySelectorAll('#variant-selector .variant-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('#variant-selector .variant-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentVariant = btn.dataset.variant;
-    });
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#variant-selector .variant-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentVariant = btn.dataset.variant;
+  });
 });
 
-// Skalierung
-document.querySelectorAll('#scale-selector .variant-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('#scale-selector .variant-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentScale = btn.dataset.scale;
-    });
+// Zeilenanzahl per Dropdown
+const linesSelect = document.getElementById('lines-select');
+linesSelect.addEventListener('change', () => {
+  currentLines = parseInt(linesSelect.value);
 });
 
 // Lauftext
 const tickerBtn = document.getElementById('cfg-show-ticker');
 tickerBtn.addEventListener('click', () => {
-    const isActive = tickerBtn.dataset.active === 'true';
-    tickerBtn.dataset.active = (!isActive).toString();
-    tickerBtn.classList.toggle('active', !isActive);
-    tickerBtn.textContent = !isActive ? 'An' : 'Aus';
+  const isActive = tickerBtn.dataset.active === 'true';
+  tickerBtn.dataset.active = (!isActive).toString();
+  tickerBtn.classList.toggle('active', !isActive);
+  tickerBtn.textContent = !isActive ? 'An' : 'Aus';
 });

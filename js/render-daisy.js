@@ -8,7 +8,7 @@ function renderDaisy(departures, totalLines, threshold, showTicker) {
 
     for (let dep of departures) {
         const isCancelled = dep.cancelled === true;
-        const directionText = dep.direction || '';
+        const directionText = shortenDestination(dep.direction, threshold, dep.line.product);
 
         // Bei Ausfall nie umbrechen — Zieltext wird per CSS abgeschnitten
         const isLong = isCancelled ? false : directionText.length > threshold;
