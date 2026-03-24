@@ -62,3 +62,11 @@ function hideLoader()            { setTimeout(() => loaderOverlay.style.display 
 function setSearchError(msg)     { searchErrorEl.textContent = msg; }
 function showSearchLoader()      { searchLoaderEl.style.display = 'inline-block'; }
 function hideSearchLoader()      { searchLoaderEl.style.display = 'none'; }
+
+// ── Line Filter Function ─────────────────────────────────────────────────────────────
+
+function getLineFilter() {
+  const input = document.getElementById('cfg-line-filter')?.value ?? '';
+  if (!input.trim()) return null; // kein Filter
+  return input.split(',').map(s => s.trim().toUpperCase()).filter(s => s.length > 0);
+}

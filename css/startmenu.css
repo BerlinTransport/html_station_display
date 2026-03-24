@@ -202,4 +202,28 @@
   background: #1a1a1a;
   color: #f0f0f0;
 }
+#cfg-line-filter {
+  width: auto;
+  min-width: 160px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 2px solid #444;
+  background: #333;
+  color: white;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: bold;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#cfg-line-filter:focus {
+  border-color: var(--bvg-yellow);
+}
+
+#cfg-line-filter::placeholder {
+  color: #777;
+  font-weight: normal;
+}
+
 

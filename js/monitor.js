@@ -73,9 +73,13 @@ async function update() {
     const data = await res.json();
     if (!data.departures) { hideLoader(); return; }
 
-    const departures = data.departures.sort((a, b) =>
-      new Date(a.when ?? a.plannedWhen) - new Date(b.when ?? b.plannedWhen)
-    );
+    const lineFilter = getLineFilter();
+
+    const departures = data.departures
+      .filter(dep => !lineFilter || lineFilter.includes(dep.line.name.toUpperCase()))
+      .sort((a, b) =>
+        new Date(a.when ?? a.plannedWhen) - new Date(b.when ?? b.plannedWhen)
+      );
 
     if (currentVariant === 'daisy') renderDaisy(departures, totalLines, threshold, showTicker);
     else renderTFT(departures, totalLines, threshold);
