@@ -27,10 +27,17 @@ function selectStation(id, name) {
   if (currentVariant === 'daisy') {
     document.getElementById('monitor-daisy').style.display = 'flex';
     document.getElementById('monitor-tft').style.display = 'none';
-  } else {
+    document.getElementById('monitor-zza').style.display = 'none';
+  } else if (currentVariant === 'tft') {
     document.getElementById('monitor-daisy').style.display = 'none';
     document.getElementById('monitor-tft').style.display = 'flex';
+    document.getElementById('monitor-zza').style.display = 'none';
+  } else {
+    document.getElementById('monitor-daisy').style.display = 'none';
+    document.getElementById('monitor-tft').style.display = 'none';
+    document.getElementById('monitor-zza').style.display = 'flex';
   }
+
 
   startMonitor();
 }

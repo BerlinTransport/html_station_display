@@ -1,0 +1,169 @@
+#monitor-zza {
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: #111a2a;
+  font-family: 'Roboto', sans-serif;
+  padding-bottom: 7vh;
+  box-sizing: border-box;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────── */
+
+.header-zza {
+  background: #111a2a;
+  /* ACHTUNG: Kein seitliches Padding hier, sonst addiert es sich! */
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.header-zza-title {
+  padding: 2vh 3vw 1.5vh 3vw;
+  font-size: 2.8vh;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.header-zza-title span {
+  font-weight: 400;
+  font-size: 0.75em;
+  color: #92a3c0;
+  margin-left: 0.5em;
+}
+
+/* ── Spaltenköpfe ────────────────────────────────────────────────────── */
+
+.header-zza-cols {
+  display: grid;
+  /* Punkt-Spalte von 6vw auf 3.5vw verkleinert */
+  grid-template-columns: 3.5vw 14vw 1fr minmax(10vw, auto) 14vw;
+  color: #92a3c0;
+  font-size: 1.4vh;
+  font-weight: 400;
+  padding: 0.8vh 3vw;
+  border-top: 2px solid #ffffff; 
+  border-bottom: 1px solid rgba(255,255,255,0.4);
+  box-sizing: border-box;
+  align-items: center;
+}
+
+/* ── Screen ──────────────────────────────────────────────────────────── */
+
+.zza-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* ── Zeile ───────────────────────────────────────────────────────────── */
+
+.row-zza {
+  display: grid;
+  /* EXAKT GLEICHES GRID WIE IM HEADER */
+  grid-template-columns: 3.5vw 14vw 1fr minmax(10vw, auto) 14vw;
+  align-items: center;
+  padding: 0 3vw;
+  border-bottom: 1px solid rgba(255,255,255,0.15); 
+  color: #ffffff;
+  overflow: hidden;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.row-zza.is-cancelled {
+  opacity: 0.6;
+}
+
+/* ── Punkt ───────────────────────────────────────────────────────────── */
+
+.zza-cell-dot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Punkt linksbündig unter den Leerraum */
+}
+
+.zza-dot {
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+.zza-dot.is-now {
+  animation: zza-blink 1.6s steps(1) infinite;
+}
+
+@keyframes zza-blink {
+  0%,  49% { background: #ffffff; }
+  50%, 100% { background: transparent; }
+}
+
+/* ── Linien-Badge ────────────────────────────────────────────────────── */
+
+.zza-cell-line {
+  display: flex;
+  align-items: center;
+}
+
+.zza-line-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1em 0.45em; /* Ein Hauch mehr Padding an den Seiten für die Rundung */
+  border-radius: 1em;    /* 1em sorgt für die volle Abrundung links und rechts */
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9em;
+  min-width: 2.8em;
+  white-space: nowrap;
+}
+
+/* ── Ziel ────────────────────────────────────────────────────────────── */
+
+.zza-cell-dest {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  overflow: hidden;
+  font-weight: 400; 
+  font-size: 1.1em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  /* padding: 0 0.5em entfernt -> Zieltext fluchtet jetzt perfekt mit dem Header! */
+}
+
+.zza-cell-dest span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.zza-dest-cancelled {
+  text-decoration: line-through;
+  color: #ff5555; /* Rote Schrift bei Ausfall */
+}
+
+/* ── Gleis ───────────────────────────────────────────────────────────── */
+
+.zza-cell-track {
+  text-align: center;
+  font-weight: 400;
+  font-size: 1.1em;
+  color: #ffffff;
+}
+
+/* ── Countdown ───────────────────────────────────────────────────────── */
+
+.zza-cell-time {
+  text-align: right;
+  font-weight: 500;
+  font-size: 1.1em;
+  font-variant-numeric: tabular-nums;
+  color: #ffffff;
+  white-space: nowrap;
+}

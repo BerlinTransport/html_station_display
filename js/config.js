@@ -47,8 +47,10 @@ document.querySelectorAll('#variant-selector .variant-btn').forEach(btn => {
     currentVariant = btn.dataset.variant;
 
     const isDaisy = currentVariant === 'daisy';
-    document.getElementById('cfg-group-ticker').style.display   = isDaisy ? 'flex' : 'none';
-    document.getElementById('cfg-group-darkmode').style.display = isDaisy ? 'none' : 'flex';
+    const isZZA   = currentVariant === 'zza';
+    document.getElementById('cfg-group-ticker').style.display = isDaisy ? 'flex' : 'none';
+    document.getElementById('cfg-group-darkmode').style.display = (currentVariant === 'tft') ? 'flex' : 'none';
+
   });
 });
 

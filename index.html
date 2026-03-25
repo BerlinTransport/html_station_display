@@ -2,12 +2,13 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>BVG DAISY - Daisy & TFT</title>
+<title>HTML Station Display</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/startmenu.css">
 <link rel="stylesheet" href="css/monitor-daisy.css">
 <link rel="stylesheet" href="css/monitor-tft.css">
+<link rel="stylesheet" href="css/monitor-zza.css">
 </head>
 <body>
 
@@ -17,13 +18,14 @@
 
 <div id="search-overlay">
     <div class="config-panel">
-        <h2>Station Display Konfiguration</h2>
+        <h2>HTML Station Display Konfiguration</h2>
 
         <div class="config-group">
             <label>Display:</label>
             <div id="variant-selector">
                 <button class="variant-btn active" data-variant="daisy">Daisy</button>
                 <button class="variant-btn" data-variant="tft">TFT</button>
+                <button class="variant-btn" data-variant="zza">ZZA (Berlin Hbf)</button>
             </div>
         </div>
 
@@ -89,6 +91,20 @@
     <div class="screen-content" id="led-container-tft"></div>
 </div>
 
+<!-- ZZA MONITOR -->
+<div id="monitor-zza">
+  <div class="header-zza">
+    <div class="header-zza-cols">
+      <span></span>
+      <span>Zug / Train</span>
+      <span>Ziel / Destination</span>
+      <span style="text-align:center">Gleis / Track</span>
+      <span style="text-align:right">Zeit / Time</span>
+    </div>
+  </div>
+  <div class="zza-screen" id="led-container-zza"></div>
+</div>
+
 <!-- GLOBALER FOOTER -->
 <div id="global-footer">
     <div id="global-footer-left">
@@ -136,6 +152,7 @@
 <script src="js/search.js"></script>
 <script src="js/render-daisy.js"></script>
 <script src="js/render-tft.js"></script>
+<script src="js/render-zza.js"></script>
 <script src="js/monitor.js"></script>
 </body>
 </html>

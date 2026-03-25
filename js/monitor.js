@@ -24,6 +24,7 @@ function goToMenu() {
   document.getElementById('search-overlay').style.display = 'flex';
   document.getElementById('monitor-daisy').style.display = 'none';
   document.getElementById('monitor-tft').style.display = 'none';
+  document.getElementById('monitor-zza').style.display = 'none';
   document.getElementById('global-station-name').textContent = '';
   document.getElementById('global-clock').style.display = 'none';
   document.getElementById('gf-sep').style.display = 'none';
@@ -41,7 +42,10 @@ document.getElementById('footer-back-btn').addEventListener('click', goToMenu);
 async function update() {
   if (!currentId) return;
 
-  const containerId = currentVariant === 'daisy' ? 'led-container-daisy' : 'led-container-tft';
+  const containerId = currentVariant === 'daisy' ? 'led-container-daisy'
+    : currentVariant === 'tft' ? 'led-container-tft'
+    : 'led-container-zza';
+
   const { totalLines, threshold } = calcScale(containerId);
 
   const showTicker = document.getElementById('cfg-show-ticker')?.dataset.active === 'true';
@@ -73,7 +77,7 @@ async function update() {
   });
 
   try {
-    const res = await fetch(`https://v6.vbb.transport.rest/stops/${currentId}/departures?${params.toString()}`);
+    const res  = await fetch(`https://v6.vbb.transport.rest/stops/${currentId}/departures?${params.toString()}`);
     const data = await res.json();
     if (!data.departures) { hideLoader(); return; }
 
@@ -81,39 +85,45 @@ async function update() {
 
     const departures = data.departures
       .filter(dep => !lineFilter || lineFilter.includes(dep.line.name.toUpperCase()))
-      .sort((a, b) =>
-        new Date(a.when ?? a.plannedWhen) - new Date(b.when ?? b.plannedWhen)
-      );
+      .sort((a, b) => new Date(a.when ?? a.plannedWhen) - new Date(b.when ?? b.plannedWhen));
 
-    if (currentVariant === 'daisy') renderDaisy(departures, totalLines, threshold, showTicker);
-    else renderTFT(departures, totalLines, threshold);
+    if (currentVariant === 'daisy')     renderDaisy(departures, totalLines, threshold, showTicker);
+    else if (currentVariant === 'tft')  renderTFT(departures, totalLines, threshold);
+    else                                renderZZA(departures, totalLines, threshold);
 
   } catch (e) {
     console.error(e);
 
-    const containerId = currentVariant === 'daisy' ? 'led-container-daisy' : 'led-container-tft';
-    const container = document.getElementById(containerId);
+    const errorContainerId = currentVariant === 'daisy' ? 'led-container-daisy'
+      : currentVariant === 'tft' ? 'led-container-tft'
+      : 'led-container-zza';
+
+    const container = document.getElementById(errorContainerId);
     if (container) {
-        container.innerHTML = '';
-        const { totalLines } = calcScale(containerId);
-        const msg = document.createElement('div');
+      container.innerHTML = '';
+      const { totalLines: tl } = calcScale(errorContainerId);
+      const msg = document.createElement('div');
 
-        if (currentVariant === 'daisy') {
-        const fontSize = Math.floor(82 / totalLines);
+      if (currentVariant === 'daisy') {
+        const fontSize = Math.floor(82 / tl);
         msg.style.cssText = `flex:1;display:flex;align-items:center;justify-content:center;color:var(--led-orange);font-family:"Archivo Narrow",sans-serif;font-size:${fontSize}vh;`;
-        } else {
-        const rowHeight = 90 / totalLines;
+      } else if (currentVariant === 'tft') {
+        const rowHeight = 90 / tl;
         msg.style.cssText = `flex:1;display:flex;align-items:center;justify-content:center;color:var(--lcd-text);font-family:"Roboto",sans-serif;font-size:${rowHeight * 0.7}vh;font-weight:bold;`;
-        }
+      } else {
+        const rowHeight = 90 / tl;
+        msg.style.cssText = `flex:1;display:flex;align-items:center;justify-content:center;color:var(--zza-text);font-family:"Roboto",sans-serif;font-size:${rowHeight * 0.7}vh;font-weight:bold;`;
+      }
 
-        msg.textContent = 'API nicht erreichbar – Neuladen in 20 Sekunden';
-        container.appendChild(msg);
+      msg.textContent = 'API nicht erreichbar – Neuladen in 20 Sekunden';
+      container.appendChild(msg);
     }
 
     hideLoader();
-    }
+  }
 }
-// ── Uhr starten ──────────────────────────────────────────────────────────
+
+// ── Uhr starten ──────────────────────────────────────────────────────────────
 
 let clockTimer = null; // separates Handle für die Uhr
 
@@ -125,12 +135,11 @@ function startClock() {
   }
   tick();
   clockTimer = setInterval(tick, 1000);
-
   document.getElementById('global-clock').style.display = 'inline';
   document.getElementById('gf-sep').style.display = 'inline';
 }
 
-// ── Monitor starten ──────────────────────────────────────────────────────────
+// ── Monitor starten ───────────────────────────────────────────────────────────
 
 function startMonitor() {
   if (!clockTimer) startClock(); // nur beim ersten Start
