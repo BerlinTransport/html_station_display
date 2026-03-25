@@ -4,12 +4,13 @@ A browser-based real-time departure board for Berlin public transport (BVG/VBB),
 
 ## ✨ Features
 
-- 🟠 Daisy Mode — authentic LED look with orange-on-black display, pixel grid filter and scrolling ticker
-- 🖥️ TFT Mode — modern LCD display with colored line badges
-- 🔍 Station Search — live search across all VBB(Berlin and Brandenburg area) stops
-- 🚇 Filters — toggle S-Bahn, U-Bahn, Tram, Bus and Regional trains individually
-- 🔄 Auto Refresh — departures reload automatically every 20–30 seconds
-- ⌨️ ESC — return to the start menu at any time
+- Daisy Mode — authentic LED look with orange-on-black display, pixel grid filter and scrolling ticker
+- TFT Mode — modern LCD display with colored line badges
+- ZZA (Berlin Hbf) Mode - modern LED display designed after the display at the berlin main station
+- Station Search — live search across all VBB(Berlin and Brandenburg area) stops
+- Filters — toggle Line, S-Bahn, U-Bahn, Tram, Bus and Regional trains individually
+- Auto Refresh — departures reload automatically every 20–30 seconds
+- Skaling — choose your number of lines in the displays
 
 ## 🚀 Quick Start
 
