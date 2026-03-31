@@ -41,13 +41,13 @@ function animateTimeChar(el, toChar, toRed, stepMs) {
 }
 
 const LINE_CHARS = [
-  ' ',
   'S1','S2','S3','S5','S7','S8','S9',
   'S25','S26','S41','S42','S45','S46','S47','S75','S85',
   'U1','U2','U3','U4','U5','U6','U7','U8','U9',
   'RE1','RE2','RE3','RE4','RE5','RE6','RE7','RE8','RE9','RE20','FEX',
   'RB10','RB11','RB12','RB13','RB14','RB20','RB21','RB22','RB23','RB24','RB33',
-  'ICE','IC','EC','RJ','RJX','NJ','EN','TGV','EST','FLX'
+  'ICE','IC','EC','RJ','RJX','NJ','EN','TGV','EST','FLX',
+  ' '
 ];
 
 // ── Hilfsfunktionen ───────────────────────────────────────
@@ -67,6 +67,25 @@ function _guessProduct(name) {
   if (name.startsWith('U'))                                                      return 'subway';
   if (name.startsWith('RE') || name.startsWith('RB') || name.startsWith('FEX')) return 'regional';
   return 'express';
+}
+
+function getSplitflapBackground(hexColor, lineName) {
+  // Wenn es das Leerzeichen ist ODER keine Farbe existiert -> leer lassen!
+  // Dadurch greift der graue 37/22 Fallback aus der CSS-Datei!
+  if (!hexColor || lineName === ' ' || hexColor === '#444444' || hexColor === '444444') {
+    return '';
+  }
+  
+  // Format absichern
+  const color = hexColor.startsWith('#') ? hexColor : `#${hexColor}`;
+  
+  return `linear-gradient(
+    to bottom,
+    color-mix(in srgb, white 15%, ${color}) 0%,
+    color-mix(in srgb, white 15%, ${color}) 50%,
+    ${color} 50%,
+    ${color} 100%
+  )`;
 }
 
 // ── Animationen ───────────────────────────────────────────
@@ -120,18 +139,19 @@ function updateLineCell(cell, lineName, bgColor, fontSize, stepMs) {
     badge.className = 'flip-line-block';
     badge.textContent = ' ';
     badge.dataset.current = ' ';
-    badge.style.fontSize = `${fontSize}vh`;
     cell.appendChild(badge);
   }
 
-  const fromName = badge.dataset.current || ' ';
+  badge.style.fontSize = `${fontSize}vh`;
+
+  const fromName = badge.dataset?.current || ' ';
   const from = Math.max(LINE_CHARS.indexOf(fromName), 0);
   const to   = LINE_CHARS.indexOf(lineName);
 
   if (to === -1) {
-    badge.textContent      = lineName;
-    badge.dataset.current  = lineName;
-    badge.style.background = `#${bgColor}`;
+    badge.textContent     = lineName;
+    badge.dataset.current = lineName;
+    badge.style.background = getSplitflapBackground(bgColor, lineName);
     return;
   }
 
@@ -144,12 +164,22 @@ function updateLineCell(cell, lineName, bgColor, fontSize, stepMs) {
   const iv = setInterval(() => {
     step++;
     const cur = LINE_CHARS[(from + step) % len];
+    
+    if (!badge || !badge.dataset) {
+      clearInterval(iv);
+      return;
+    }
+
     badge.textContent     = cur;
     badge.dataset.current = cur;
-    const curBg = getLineColor({
+    
+    let curBg = getLineColor({
       line: { name: cur, product: _guessProduct(cur) }
-    }).replace('#', '');
-    badge.style.background = `#${curBg}`;
+    });
+    
+    // Setze den Verlauf (oder entferne ihn für die grauen RGB-Werte)
+    badge.style.background = getSplitflapBackground(curBg, cur);
+    
     if (step >= dist) clearInterval(iv);
   }, stepMs);
 }
@@ -260,6 +290,13 @@ function renderFlip(departures, totalLines, threshold) {
       lineName = operatorPrefix === 'FLX'
         ? 'FLX'
         : (dep.line?.name ?? '').replace(/\s*\d+.*$/, '').trim();
+    }
+    
+    const isBusOrTram = ['bus', 'tram'].includes(dep.line.product);
+    const isUnknownLine = !LINE_CHARS.includes(lineName);
+
+    if (isBusOrTram || isUnknownLine) {
+      lineName = ' ';
     }
 
     let track = '';

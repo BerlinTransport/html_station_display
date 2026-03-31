@@ -62,23 +62,44 @@
 .flip-cell-track { justify-content: center; }
 .flip-cell-time  { justify-content: flex-end; }
 
-/* ── Linienbadge ─────────────────────────────────────────── */
-.flip-line-badge {
+/* ── Linienbadge (Block) ─────────────────────────────────── */
+.flip-line-block {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.05em 0.35em;
-  border-radius: 0.2em;
-  color: #fff;
+
+  height: var(--tile-h);
+  width: calc(var(--tile-h) * 2.8);
+
   font-weight: 700;
   white-space: nowrap;
-  line-height: 1.4;
+  border-radius: 2px;
+  outline: 1px solid #000;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.02em;
+  color: #fff;
+
+  /* Standard-Hintergrund für leere Flips (deine exakten RGB-Werte) */
+  background: linear-gradient(
+    to bottom,
+    rgb(37, 37, 37) 0%,
+    rgb(37, 37, 37) 50%,
+    rgb(22, 22, 22) 50%,
+    rgb(22, 22, 22) 100%
+  );
 }
 
-.flip-line-express {
-  color: #f0c040;
-  font-weight: 700;
-  white-space: nowrap;
+.flip-line-block::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(50% - 0.5px);
+  height: 1px;
+  background: #000;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.08);
+  pointer-events: none;
 }
 
 /* ── Zeit-Separator ──────────────────────────────────────── */
